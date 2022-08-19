@@ -4,5 +4,9 @@
         <file>qtquickcontrols2.conf</file>
         <file>MTextField.qml</file>
         <file>resource/materialdesignicons-webfont.ttf</file>
+        <file>resource/Icon.js</file>
+        <file>ServerPage.qml</file>
+        <file>ClientPage.qml</file>
+        <file>SettingPage.qml</file>
     </qresource>
 </RCC>

@@ -2,70 +2,54 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
-import CppNetWork 1.0
 
-Window {
+ApplicationWindow {
 	width: 360
 	height: 640
 	visible: true
 	title: qsTr("TCP Socket Test")
 	id: mainWindow
 
-	NetWork {
-		id: network
+//	Material.theme: Material.Dark
+
+	ListModel {
+		id: tabBarModel
+		ListElement { buttonText: "服务器"; pageUrl:"qrc:/ServerPage.qml" }
+		ListElement { buttonText: "客户端"; pageUrl:"qrc:/ClientPage.qml" }
+		ListElement { buttonText: "设置"; pageUrl:"qrc:/SettingPage.qml" }
 	}
 
-	Column {
-		anchors.fill: parent
-		anchors.leftMargin: 20
-		anchors.rightMargin: 20
-		Item {
-			anchors.left: parent.left
-			anchors.right: parent.right
-			height: 53
+	header: TabBar {
+		id: bar
+		width: parent.width
+		currentIndex: view.currentIndex
 
-//			Rectangle {
-//				anchors.fill: parent
-//				color: "transparent"
-//				border.width: 1
-//			}
-
-			Row {
-				anchors.left: parent.left
-				height: parent.height
-
-				spacing: 10
-
-				MTextField {
-					id: serverIP
-					placeholderText: "错误：无法获取"
-					height: parent.height
-					width: 150
-					label: qsTr("服务器IP")
-//					text: "127.0.0.1"
-					textField.readOnly: true
-//					textField.enabled: false
-					Component.onCompleted: {
-						serverIP.text = network.getHostIPAddress();
-					}
-				}
-
-				MTextField {
-					id: serverPort
-					height: parent.height
-					width: 60
-					label: qsTr("端口")
-//					placeholderText: "10088"
-				}
-
-			}
-
-			Button {
-//				height: parent.height
-				anchors.verticalCenter: parent.verticalCenter
-				anchors.right: parent.right
-				text: qsTr("开始监听")
+		Repeater {
+			model: tabBarModel
+			TabButton {
+				height: bar.height
+				text: buttonText
 			}
 		}
 	}
+
+	SwipeView {
+		id: view
+		currentIndex: bar.currentIndex
+		anchors.fill: parent
+		anchors.topMargin: 10
+
+		Repeater {
+			model: tabBarModel
+			Loader {
+//				active: SwipeView.isCurrentItem || SwipeView.isNextItem || SwipeView.isPreviousItem
+				active: true
+				source: pageUrl
+			}
+		}
+	}
+
+	// ServerPage{
+	// 	anchors.fill: parent
+	// }
 }
