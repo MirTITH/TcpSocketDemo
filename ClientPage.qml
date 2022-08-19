@@ -12,11 +12,11 @@ Page {
 
 		MTextField {
 			id: serverIP
+			height: parent.height
 			anchors.left: parent.left
 			anchors.right: serverPort.left
-			anchors.rightMargin: 20
 			anchors.leftMargin: 10
-			height: parent.height
+			anchors.rightMargin: 10
 
 			label: qsTr("目标服务器的IP")
 			textField.readOnly: false
@@ -24,20 +24,34 @@ Page {
 
 		MTextField {
 			id: serverPort
-			anchors.right: startConnect.left
-			anchors.rightMargin: 10
 			height: parent.height
 			width: 60
+			anchors.right: connectSwitchCol.left
+			anchors.rightMargin: 20
+
 			label: qsTr("端口")
 			placeholderText: "10088"
 		}
 
-		Button {
-			id: startConnect
-			anchors.verticalCenter: parent.verticalCenter
+		Item {
+			id: connectSwitchCol
+			height: parent.height
+			width: 80
 			anchors.right: parent.right
 			anchors.rightMargin: 10
-			text: qsTr("连接")
+
+			Text {
+				anchors.horizontalCenter: parent.horizontalCenter
+				text: connectSwitch.checked ? qsTr("已连接") : qsTr("未连接")
+				color: connectSwitch.checked ? Material.accentColor : Material.secondaryTextColor
+			}
+
+			Switch {
+				id: connectSwitch
+				anchors.horizontalCenter: parent.horizontalCenter
+				anchors.top: parent.top
+				anchors.topMargin: 10
+			}
 		}
 	}
 
@@ -65,7 +79,7 @@ Page {
 				background: Rectangle {
 					color: "transparent"
 					border.width: 1
-					radius: 3
+					radius: 5
 					border.color: Material.primaryColor
 					opacity: 0.5
 				}
@@ -89,9 +103,9 @@ Page {
 				anchors.verticalCenterOffset: -5
 				anchors.rightMargin: 0
 				text: MdiFont.Icon.send
-//				radius: 24
-//				width: 36
-//				height: 36
+				//				radius: 24
+				//				width: 36
+				//				height: 36
 				font.pixelSize: 20
 				opacity: 0.75
 				onClicked: {

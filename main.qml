@@ -6,9 +6,13 @@ import QtQuick.Controls.Material 2.15
 ApplicationWindow {
 	width: 360
 	height: 640
+	minimumWidth: 300
+	minimumHeight: 240
 	visible: true
 	title: qsTr("TCP Socket Test")
 	id: mainWindow
+
+//	Material.accent: Material.BlueGrey
 
 //	Material.theme: Material.Dark
 

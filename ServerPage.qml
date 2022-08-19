@@ -30,13 +30,20 @@ Page {
 				id: refreshHostIP
 				anchors.right: parent.right
 				anchors.verticalCenter: parent.verticalCenter
-				anchors.verticalCenterOffset: -5
+				anchors.verticalCenterOffset: -6
 				anchors.rightMargin: 0
-				text: MdiFont.Icon.refresh
+				Text {
+					id: refreshIcon
+					anchors.fill: parent
+					horizontalAlignment: Text.AlignHCenter
+					verticalAlignment: Text.AlignVCenter
+					text: MdiFont.Icon.refresh
+					font.pixelSize: 24
+					color: Material.primaryTextColor
+				}
 				radius: 24
 				width: 2 * radius
 				height: 2 * radius
-				font.pixelSize: 20
 				opacity: 0.75
 				onClicked: {
 					rotAni.restart()
@@ -45,7 +52,7 @@ Page {
 
 				RotationAnimation {
 					id: rotAni
-					target: refreshHostIP
+					target: refreshIcon
 					property: "rotation"
 					from: 0
 					to: 360
@@ -60,20 +67,32 @@ Page {
 
 		MTextField {
 			id: serverPort
-			anchors.right: startListen.left
-			anchors.rightMargin: 10
+			anchors.right: listenSwitchCol.left
+			anchors.rightMargin: 20
 			height: parent.height
 			width: 60
 			label: qsTr("端口")
 			placeholderText: "10088"
 		}
 
-		Button {
-			id: startListen
-			anchors.verticalCenter: parent.verticalCenter
+		Item {
+			id: listenSwitchCol
+			height: parent.height
+			width: 70
 			anchors.right: parent.right
 			anchors.rightMargin: 10
-			text: qsTr("开始监听")
+			Text {
+				anchors.horizontalCenter: parent.horizontalCenter
+				text: listenSwitch.checked ? qsTr("正在监听") : qsTr("未监听")
+				color: listenSwitch.checked ? Material.accentColor : Material.secondaryTextColor
+			}
+
+			Switch {
+				id: listenSwitch
+				anchors.horizontalCenter: parent.horizontalCenter
+				anchors.top: parent.top
+				anchors.topMargin: 10
+			}
 		}
 	}
 
@@ -100,7 +119,7 @@ Page {
 				background: Rectangle {
 					color: "transparent"
 					border.width: 1
-					radius: 3
+					radius: 5
 					border.color: Material.primaryColor
 					opacity: 0.5
 				}
