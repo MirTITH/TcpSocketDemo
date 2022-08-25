@@ -2,6 +2,7 @@
 #define NETWORK_H
 
 #include <QObject>
+//#include <stdint
 
 class NetWork : public QObject
 {

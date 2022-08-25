@@ -7,7 +7,7 @@ ApplicationWindow {
 	width: 360
 	height: 640
 	minimumWidth: 300
-	minimumHeight: 240
+	minimumHeight: 300
 	visible: true
 	title: qsTr("TCP Socket Test")
 	id: mainWindow

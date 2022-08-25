@@ -1,9 +1,10 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-//#include "mythread.h"
-#include <QThread>
 #include <QFontDatabase>
+#include <QQmlContext>
 #include "network.h"
+#include "tcpserver.h"
+#include "tcpclient.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,17 +21,20 @@ int main(int argc, char *argv[])
 			QCoreApplication::exit(-1);
 	}, Qt::QueuedConnection);
 
-
 	QFontDatabase::addApplicationFont(":/resource/materialdesignicons-webfont.ttf");
-	qmlRegisterType<NetWork>("CppNetWork", 1, 0, "NetWork");
 
+	NetWork network;
 
+	TcpServer tcpServer;
+	TcpClient tcpClient;
 
-//	auto t1 = new MyThread();
+	auto context = engine.rootContext();
+	context->setContextProperty("_network", &network);
+	context->setContextProperty("_tcpServer", &tcpServer);
+	context->setContextProperty("_tcpClient", &tcpClient);
 
-//	t1->start();
-
-//	auto context = engine.rootContext();
+	qmlRegisterType<TcpServer>("TcpServer", 1, 0, "TcpServer");
+	qmlRegisterType<TcpClient>("TcpClient", 1, 0, "TcpClient");
 
 	engine.load(url);
 	return app.exec();

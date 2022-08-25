@@ -16,8 +16,9 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick)
 
 set(PROJECT_SOURCES
         main.cpp
-        mythread.h mythread.cpp
         network.h network.cpp
+        tcpserver.h tcpserver.cpp
+        tcpclient.h tcpclient.cpp
         qml.qrc
 )
 

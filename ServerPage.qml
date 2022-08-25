@@ -1,14 +1,38 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import CppNetWork 1.0
+import QtQuick.Controls.Material 2.15
+import QtQuick.Layouts 1.15
 import "qrc:/resource/Icon.js" as MdiFont
 
 Page {
-	NetWork {id: network}
-
 	header:	Item {
 		id: head
-		height: 53
+		height: 45
+
+		Connections {
+			target: _tcpServer
+			function onNewMessage(name, message){
+				serverTextArea.text += "From " + name + ": " + message + "\n"
+			}
+			function onClientConnected(key){
+				listModelClients.append({text: key})
+			}
+			function onClientDisconnected(key){
+				for(var i = 0;;i++){
+					var obj = listModelClients.get(i)
+					if(obj === null)
+					{
+						break;
+					}
+
+					if(obj.text === key)
+					{
+						listModelClients.remove(i)
+						break;
+					}
+				}
+			}
+		}
 
 		MTextField {
 			id: hostIP
@@ -20,10 +44,11 @@ Page {
 
 			label: qsTr("主机IP")
 			placeholderText: "错误：无法获取"
-			textField.readOnly: true
+			readOnly: true
+			selectByMouse: true
 
 			Component.onCompleted: {
-				hostIP.text = network.getHostIPAddress();
+				hostIP.text = _network.getHostIPAddress();
 			}
 
 			RoundButton {
@@ -32,6 +57,7 @@ Page {
 				anchors.verticalCenter: parent.verticalCenter
 				anchors.verticalCenterOffset: -6
 				anchors.rightMargin: 0
+				background: null
 				Text {
 					id: refreshIcon
 					anchors.fill: parent
@@ -39,15 +65,16 @@ Page {
 					verticalAlignment: Text.AlignVCenter
 					text: MdiFont.Icon.refresh
 					font.pixelSize: 24
-					color: Material.primaryTextColor
+					color: parent.down ? Material.accentColor : Material.primaryTextColor
 				}
-				radius: 24
+				radius: 20
 				width: 2 * radius
 				height: 2 * radius
 				opacity: 0.75
+
 				onClicked: {
 					rotAni.restart()
-					hostIP.text = network.getHostIPAddress()
+					hostIP.text = _network.getHostIPAddress()
 				}
 
 				RotationAnimation {
@@ -73,6 +100,7 @@ Page {
 			width: 60
 			label: qsTr("端口")
 			placeholderText: "10088"
+			selectByMouse: true
 		}
 
 		Item {
@@ -83,6 +111,7 @@ Page {
 			anchors.rightMargin: 10
 			Text {
 				anchors.horizontalCenter: parent.horizontalCenter
+				font.pixelSize: 14
 				text: listenSwitch.checked ? qsTr("正在监听") : qsTr("未监听")
 				color: listenSwitch.checked ? Material.accentColor : Material.secondaryTextColor
 			}
@@ -92,6 +121,17 @@ Page {
 				anchors.horizontalCenter: parent.horizontalCenter
 				anchors.top: parent.top
 				anchors.topMargin: 10
+				onCheckedChanged: {
+					if(checked)
+					{
+						var result = _tcpServer.listen(Number(serverPort.text ? serverPort.text : serverPort.placeholderText))
+						console.log(result)
+					}
+					else
+					{
+						_tcpServer.close()
+					}
+				}
 			}
 		}
 	}
@@ -113,9 +153,13 @@ Page {
 			anchors.bottom: parent.bottom
 
 			TextArea {
-				text: "TextArea\n...\n...\n...\n...\n...\n...\n"
+				id: serverTextArea
+				placeholderText: qsTr("还没有消息哦")
 				selectByMouse: true
 				readOnly: true
+
+				wrapMode: TextEdit.WordWrap
+
 				background: Rectangle {
 					color: "transparent"
 					border.width: 1
@@ -125,34 +169,80 @@ Page {
 				}
 			}
 		}
-
 	}
 
 	footer: Item {
-		height: 53
-		MTextField {
+		height: 90
+
+		ColumnLayout {
 			anchors.fill: parent
 			anchors.leftMargin: 10
 			anchors.rightMargin: 10
-			label: qsTr("待发送的消息")
+			RowLayout {
+				Layout.fillWidth: true
 
-			Button {
-				id: sendMsgBtn
-				anchors.right: parent.right
-				anchors.verticalCenter: parent.verticalCenter
-				anchors.verticalCenterOffset: -5
-				anchors.rightMargin: 0
-				text: MdiFont.Icon.send
-//				radius: 24
-//				width: 36
-//				height: 36
-				font.pixelSize: 20
-				opacity: 0.75
-				onClicked: {
-
+				Layout.preferredHeight: 40
+				Layout.fillHeight: true
+				Text {
+					text: qsTr("发送消息的对象：")
+					color: Material.primaryTextColor
+					Layout.fillHeight: true
+					font.pixelSize: 14
+					verticalAlignment: Text.AlignVCenter
+				}
+				ComboBox {
+					id: comboBoxClientSelecter
+					opacity: 0.75
+					Layout.fillHeight: true
+					Layout.fillWidth: true
+					model: ListModel {
+						id: listModelClients
+					}
 				}
 			}
 
+			MTextField {
+				id: textMsgToSend
+				Layout.preferredHeight: 45
+				Layout.fillWidth: true
+				selectByMouse: true
+
+				label: qsTr("待发送的消息")
+
+				onAccepted:{
+					sendMsgBtn.clicked()
+				}
+
+				Button {
+					id: sendMsgBtn
+					height: parent.height
+					width: 40
+					anchors.right: parent.right
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.verticalCenterOffset: -5
+					anchors.rightMargin: 0
+
+					contentItem: Text {
+						text: parent.text
+						font: parent.font
+						color: parent.down ? Material.accentColor : Material.primaryTextColor
+						horizontalAlignment: Text.AlignHCenter
+						verticalAlignment: Text.AlignVCenter
+						//							elide: Text.ElideRight
+					}
+
+					text: MdiFont.Icon.send
+					font.pixelSize: 24
+					opacity: 0.75
+					background: null
+					onClicked: {
+						_tcpServer.sendMessageToClient(comboBoxClientSelecter.currentText, textMsgToSend.text)
+						serverTextArea.text += "To " + comboBoxClientSelecter.currentText + ": " + textMsgToSend.text + "\n"
+						textMsgToSend.text = null
+					}
+				}
+
+			}
 		}
 	}
 }

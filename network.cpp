@@ -1,7 +1,6 @@
 #include "network.h"
 #include <QNetworkInterface>
 #include <QList>
-//#include <QGuiApplication>
 
 NetWork::NetWork(QObject *parent)
 	: QObject{parent}

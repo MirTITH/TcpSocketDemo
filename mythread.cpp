@@ -1,4 +1,5 @@
 #include "mythread.h"
+#include "qdebug.h"
 #include <QGuiApplication>
 
 MyThread::MyThread(QObject *parent)
